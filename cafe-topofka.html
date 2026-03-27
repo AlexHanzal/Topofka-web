@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Café Topofka — Jirkov</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #f5f0e8;
+      --warm-white: #faf8f3;
+      --espresso: #2a1a0e;
+      --mocha: #4a2c1a;
+      --caramel: #c4843a;
+      --gold: #d4a04a;
+      --latte: #b8956a;
+      --steam: rgba(255,255,255,0.07);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--espresso);
+      color: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.4;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 3rem;
+      background: linear-gradient(to bottom, rgba(42,26,14,0.95), transparent);
+      mix-blend-mode: normal;
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-style: italic;
+      color: var(--gold);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--cream);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 300;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      opacity: 0.8;
+      transition: opacity 0.3s, color 0.3s;
+    }
+
+    .nav-links a:hover { opacity: 1; color: var(--gold); }
+
+    /* HERO */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 30% 40%, #3d1f0a 0%, var(--espresso) 60%);
+    }
+
+    .hero-bg-circle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .hero-bg-circle:nth-child(1) {
+      width: 600px; height: 600px;
+      top: -150px; right: -100px;
+      background: radial-gradient(circle, rgba(196,132,58,0.12) 0%, transparent 70%);
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+
+    .hero-bg-circle:nth-child(2) {
+      width: 400px; height: 400px;
+      bottom: -100px; left: 5%;
+      background: radial-gradient(circle, rgba(196,132,58,0.08) 0%, transparent 70%);
+      animation: drift 16s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(30px, -30px) scale(1.05); }
+    }
+
+    /* Steam animation */
+    .steam-container {
+      position: absolute;
+      top: 20%; left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 18px;
+    }
+
+    .steam {
+      width: 3px;
+      height: 50px;
+      background: linear-gradient(to top, transparent, rgba(255,255,255,0.12), transparent);
+      border-radius: 50%;
+      animation: steam-rise 3s ease-in-out infinite;
+      transform-origin: bottom;
+    }
+
+    .steam:nth-child(2) { animation-delay: 0.6s; height: 40px; }
+    .steam:nth-child(3) { animation-delay: 1.2s; height: 60px; }
+
+    @keyframes steam-rise {
+      0%   { transform: scaleX(1) translateY(0); opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 0.3; }
+      100% { transform: scaleX(2.5) translateY(-60px); opacity: 0; }
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 2;
+      animation: hero-fade 1.2s ease both;
+    }
+
+    @keyframes hero-fade {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      font-weight: 300;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: hero-fade 1s 0.3s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(5rem, 12vw, 10rem);
+      font-weight: 700;
+      line-height: 0.9;
+      color: var(--cream);
+      letter-spacing: -0.02em;
+      opacity: 0;
+      animation: hero-fade 1s 0.5s ease both;
+    }
+
+    .hero-title em {
+      display: block;
+      font-style: italic;
+      color: var(--gold);
+      font-weight: 400;
+    }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-style: italic;
+      color: var(--latte);
+      margin-top: 1.5rem;
+      letter-spacing: 0.05em;
+      opacity: 0;
+      animation: hero-fade 1s 0.7s ease both;
+    }
+
+    .hero-cta {
+      margin-top: 3rem;
+      display: inline-flex;
+      gap: 1.5rem;
+      opacity: 0;
+      animation: hero-fade 1s 0.9s ease both;
+    }
+
+    .btn-primary {
+      background: var(--caramel);
+      color: var(--warm-white);
+      border: none;
+      padding: 0.85rem 2.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-primary:hover { background: var(--gold); transform: translateY(-2px); }
+
+    .btn-outline {
+      border: 1px solid rgba(196,132,58,0.5);
+      color: var(--gold);
+      padding: 0.85rem 2.2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 300;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: border-color 0.3s, background 0.3s, transform 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--gold);
+      background: rgba(196,132,58,0.1);
+      transform: translateY(-2px);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0.4;
+      animation: bounce 2.5s ease-in-out infinite;
+    }
+
+    .scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--latte), transparent);
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ABOUT */
+    .about {
+      padding: 8rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      align-items: center;
+    }
+
+    .about-text .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 1.2rem;
+    }
+
+    .about-text h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 400;
+      line-height: 1.15;
+      color: var(--cream);
+      margin-bottom: 1.5rem;
+    }
+
+    .about-text h2 em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .about-text p {
+      font-size: 1rem;
+      line-height: 1.85;
+      color: rgba(245,240,232,0.65);
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .rating-badge {
+      margin-top: 2.5rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: rgba(196,132,58,0.1);
+      border: 1px solid rgba(196,132,58,0.25);
+      padding: 1rem 1.5rem;
+    }
+
+    .rating-stars { color: var(--gold); font-size: 1.1rem; letter-spacing: 2px; }
+
+    .rating-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--latte);
+    }
+
+    .about-visual {
+      position: relative;
+    }
+
+    .coffee-cup {
+      width: 100%;
+      max-width: 380px;
+      aspect-ratio: 1;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Decorative ornament */
+    .ornament {
+      position: absolute;
+      right: -2rem;
+      top: -2rem;
+      width: 120px;
+      height: 120px;
+      border: 1px solid rgba(196,132,58,0.2);
+      transform: rotate(15deg);
+    }
+
+    .ornament::after {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 1px solid rgba(196,132,58,0.1);
+    }
+
+    /* MENU */
+    .menu-section {
+      padding: 6rem 0;
+      background: linear-gradient(180deg, transparent, rgba(74,44,26,0.3), transparent);
+      position: relative;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 5rem;
+      padding: 0 2rem;
+    }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 400;
+      color: var(--cream);
+      line-height: 1.1;
+    }
+
+    .section-title em { font-style: italic; color: var(--gold); }
+
+    .menu-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    .menu-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(196,132,58,0.1);
+      padding: 2.5rem 2rem;
+      transition: background 0.4s, border-color 0.4s, transform 0.3s;
+      cursor: default;
+    }
+
+    .menu-card:hover {
+      background: rgba(196,132,58,0.07);
+      border-color: rgba(196,132,58,0.3);
+      transform: translateY(-4px);
+    }
+
+    .menu-card-icon {
+      font-size: 2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .menu-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 0.8rem;
+    }
+
+    .menu-card p {
+      font-size: 0.88rem;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.5);
+      font-weight: 300;
+    }
+
+    .menu-items {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 0.85rem;
+      color: rgba(245,240,232,0.6);
+      border-bottom: 1px dotted rgba(196,132,58,0.15);
+      padding-bottom: 0.4rem;
+    }
+
+    .menu-item .item-name { font-weight: 300; }
+    .menu-item .item-price { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1rem; }
+
+    /* HOURS & INFO */
+    .info-section {
+      padding: 8rem 0;
+    }
+
+    .info-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 5rem;
+      align-items: start;
+    }
+
+    .hours-card {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(196,132,58,0.15);
+      padding: 3rem;
+    }
+
+    .hours-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(196,132,58,0.2);
+    }
+
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.6rem 0;
+      font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .hours-row .day { color: rgba(245,240,232,0.5); font-weight: 300; }
+    .hours-row .time { color: var(--gold); font-family: 'Cormorant Garamond', serif; font-size: 1rem; }
+
+    .contact-info h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      font-weight: 400;
+      color: var(--cream);
+      margin-bottom: 2rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .contact-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(196,132,58,0.15);
+      border: 1px solid rgba(196,132,58,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .contact-detail .label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--caramel);
+      margin-bottom: 0.3rem;
+    }
+
+    .contact-detail .value {
+      font-size: 0.95rem;
+      color: var(--cream);
+      font-weight: 300;
+      line-height: 1.5;
+    }
+
+    .contact-detail a {
+      color: var(--cream);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .contact-detail a:hover { color: var(--gold); }
+
+    /* MAP placeholder */
+    .map-preview {
+      margin-top: 2.5rem;
+      aspect-ratio: 16/7;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(196,132,58,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .map-preview::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 40px, rgba(196,132,58,0.04) 40px, rgba(196,132,58,0.04) 41px
+      ),
+      repeating-linear-gradient(
+        90deg, transparent, transparent 40px, rgba(196,132,58,0.04) 40px, rgba(196,132,58,0.04) 41px
+      );
+    }
+
+    .map-pin {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+    }
+
+    .map-pin-dot {
+      width: 16px;
+      height: 16px;
+      background: var(--caramel);
+      border-radius: 50%;
+      margin: 0 auto 0.5rem;
+      box-shadow: 0 0 0 6px rgba(196,132,58,0.2);
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 6px rgba(196,132,58,0.2); }
+      50% { box-shadow: 0 0 0 14px rgba(196,132,58,0.05); }
+    }
+
+    .map-pin span {
+      font-size: 0.75rem;
+      color: rgba(245,240,232,0.5);
+      letter-spacing: 0.1em;
+    }
+
+    /* REVIEWS */
+    .reviews-section {
+      padding: 6rem 0;
+      background: rgba(74,44,26,0.2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .reviews-section::before {
+      content: '❝';
+      position: absolute;
+      font-size: 20rem;
+      color: rgba(196,132,58,0.04);
+      top: -2rem;
+      left: 3%;
+      font-family: 'Playfair Display', serif;
+      line-height: 1;
+    }
+
+    .reviews-grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    .review-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(196,132,58,0.1);
+      padding: 2rem;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+
+    .review-card:hover { border-color: rgba(196,132,58,0.3); }
+
+    .review-stars { color: var(--gold); font-size: 0.85rem; letter-spacing: 3px; margin-bottom: 1rem; }
+
+    .review-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-style: italic;
+      line-height: 1.7;
+      color: rgba(245,240,232,0.7);
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 4rem 3rem 3rem;
+      border-top: 1px solid rgba(196,132,58,0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .footer-brand .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-style: italic;
+      color: var(--gold);
+      display: block;
+      margin-bottom: 0.4rem;
+    }
+
+    .footer-brand p {
+      font-size: 0.8rem;
+      color: rgba(245,240,232,0.35);
+      letter-spacing: 0.05em;
+    }
+
+    .footer-center {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 1rem;
+      color: rgba(245,240,232,0.4);
+      max-width: 260px;
+      line-height: 1.6;
+    }
+
+    .footer-right p {
+      font-size: 0.75rem;
+      color: rgba(245,240,232,0.3);
+      text-align: right;
+      line-height: 1.8;
+    }
+
+    /* DIVIDER */
+    .divider {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .divider-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(196,132,58,0.3), transparent);
+    }
+
+    .divider-ornament {
+      color: var(--caramel);
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    /* CHILD CORNER */
+    .features-strip {
+      max-width: 1100px;
+      margin: 0 auto 0;
+      padding: 3rem;
+      display: flex;
+      justify-content: center;
+      gap: 4rem;
+      flex-wrap: wrap;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.82rem;
+      color: rgba(245,240,232,0.5);
+      letter-spacing: 0.05em;
+    }
+
+    .feature-icon { font-size: 1.1rem; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      nav { padding: 1.2rem 1.5rem; }
+      .nav-links { gap: 1.5rem; }
+      .about-grid, .info-grid { grid-template-columns: 1fr; gap: 3rem; }
+      .menu-grid, .reviews-grid { grid-template-columns: 1fr; }
+      .about-visual { display: none; }
+      footer { flex-direction: column; align-items: flex-start; }
+      .footer-right p { text-align: left; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .menu-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Café Topofka</div>
+  <ul class="nav-links">
+    <li><a href="#about">O nás</a></li>
+    <li><a href="#menu">Nabídka</a></li>
+    <li><a href="#hours">Kontakt</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-circle"></div>
+  <div class="hero-bg-circle"></div>
+
+  <div class="steam-container">
+    <div class="steam"></div>
+    <div class="steam"></div>
+    <div class="steam"></div>
+  </div>
+
+  <div class="hero-content">
+    <p class="hero-eyebrow">Jirkov · Náměstí Dr. E. Beneše</p>
+    <h1 class="hero-title">
+      Café
+      <em>Topofka</em>
+    </h1>
+    <p class="hero-subtitle">Místo kde čas plyne pomaleji</p>
+    <div class="hero-cta">
+      <a href="#menu" class="btn-primary">Naše nabídka</a>
+      <a href="#hours" class="btn-outline">Kontakt</a>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-grid">
+    <div class="about-text">
+      <p class="section-label">O nás</p>
+      <h2>Srdce <em>náměstí</em>,<br>duše Jirkova</h2>
+      <p>Kavárna Topofka je oblíbeným místem setkávání v samém srdci Jirkova. Nabízíme výběrovou kávu, domácí dezerty a příjemnou atmosféru, která vás pohltí od první návštěvy.</p>
+      <p>Přijďte si odpočinout, pokecat s přáteli nebo prostě jen vychutnat šálek skvělé kávy — dětský koutek postarán o vaše nejmenší, zatímco vy si užijete klid.</p>
+
+      <div class="rating-badge">
+        <div>
+          <div class="rating-stars">★★★★★</div>
+          <div class="rating-text">4.5 / 5 · přes 250 hodnocení</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-visual">
+      <div class="ornament"></div>
+      <!-- Decorative SVG coffee cup illustration -->
+      <svg class="coffee-cup" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="plateGrad" cx="50%" cy="60%">
+            <stop offset="0%" stop-color="#5a341e"/>
+            <stop offset="100%" stop-color="#2a1a0e"/>
+          </radialGradient>
+          <radialGradient id="cupGrad" cx="40%" cy="30%">
+            <stop offset="0%" stop-color="#6b3f22"/>
+            <stop offset="100%" stop-color="#3a2010"/>
+          </radialGradient>
+          <radialGradient id="coffeeGrad" cx="50%" cy="50%">
+            <stop offset="0%" stop-color="#7a4a20"/>
+            <stop offset="100%" stop-color="#4a2a10"/>
+          </radialGradient>
+        </defs>
+        <!-- Saucer -->
+        <ellipse cx="190" cy="295" rx="120" ry="22" fill="url(#plateGrad)" stroke="rgba(196,132,58,0.3)" stroke-width="1"/>
+        <ellipse cx="190" cy="290" rx="100" ry="14" fill="none" stroke="rgba(196,132,58,0.15)" stroke-width="1"/>
+        <!-- Cup body -->
+        <path d="M110 200 Q105 280 190 285 Q275 280 270 200 Z" fill="url(#cupGrad)" stroke="rgba(196,132,58,0.3)" stroke-width="1.5"/>
+        <!-- Cup top ellipse -->
+        <ellipse cx="190" cy="200" rx="80" ry="20" fill="#4a2a10" stroke="rgba(196,132,58,0.4)" stroke-width="1.5"/>
+        <!-- Coffee surface -->
+        <ellipse cx="190" cy="200" rx="72" ry="16" fill="url(#coffeeGrad)"/>
+        <!-- Latte art -->
+        <ellipse cx="190" cy="200" rx="50" ry="10" fill="none" stroke="rgba(245,240,232,0.15)" stroke-width="1"/>
+        <path d="M165 200 Q190 192 215 200" fill="none" stroke="rgba(245,240,232,0.2)" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M175 204 Q190 197 205 204" fill="none" stroke="rgba(245,240,232,0.12)" stroke-width="1" stroke-linecap="round"/>
+        <!-- Handle -->
+        <path d="M270 220 Q310 220 310 245 Q310 270 270 265" fill="none" stroke="rgba(196,132,58,0.5)" stroke-width="10" stroke-linecap="round"/>
+        <!-- Highlight on cup -->
+        <path d="M125 215 Q120 250 128 270" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Steam wisps -->
+        <path d="M160 190 Q155 165 162 145" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M190 185 Q183 155 191 130" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M220 190 Q218 160 225 140" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Decorative ring around saucer -->
+        <ellipse cx="190" cy="295" rx="140" ry="28" fill="none" stroke="rgba(196,132,58,0.1)" stroke-width="1"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="features-strip">
+    <div class="feature"><span class="feature-icon">☕</span> Výběrová káva</div>
+    <div class="feature"><span class="feature-icon">🍰</span> Domácí dezerty</div>
+    <div class="feature"><span class="feature-icon">👧</span> Dětský koutek</div>
+    <div class="feature"><span class="feature-icon">🚻</span> WC k dispozici</div>
+    <div class="feature"><span class="feature-icon">📍</span> Centrum Jirkova</div>
+  </div>
+</section>
+
+<!-- MENU -->
+<section class="menu-section" id="menu">
+  <div class="section-header">
+    <span class="section-label">Nabídka</span>
+    <h2 class="section-title">Co vás <em>potěší</em></h2>
+  </div>
+
+  <div class="menu-grid">
+    <div class="menu-card">
+      <div class="menu-card-icon">☕</div>
+      <h3>Káva & Nápoje</h3>
+      <p>Pečlivě připravené kávové speciality z kvalitních zrnových káv.</p>
+      <div class="menu-items">
+        <div class="menu-item"><span class="item-name">Espresso</span><span class="item-price">45 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Cappuccino</span><span class="item-price">65 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Latte macchiato</span><span class="item-price">75 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Flat white</span><span class="item-price">70 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Horká čokoláda</span><span class="item-price">75 Kč</span></div>
+      </div>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-card-icon">🍰</div>
+      <h3>Dezerty & Dorty</h3>
+      <p>Vybrané dezerty a velkorysé kousky dortů — klasické i sezónní.</p>
+      <div class="menu-items">
+        <div class="menu-item"><span class="item-name">Arašídový dort</span><span class="item-price">75 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Cheesecake</span><span class="item-price">80 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Tiramisu</span><span class="item-price">85 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Brownie</span><span class="item-price">65 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Dezert dne</span><span class="item-price">od 65 Kč</span></div>
+      </div>
+    </div>
+
+    <div class="menu-card">
+      <div class="menu-card-icon">🥤</div>
+      <h3>Studené nápoje</h3>
+      <p>Osvěžující nápoje na teplé dny — limonády, džusy, cold brew.</p>
+      <div class="menu-items">
+        <div class="menu-item"><span class="item-name">Cold brew káva</span><span class="item-price">85 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Ledový čaj</span><span class="item-price">55 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Domácí limonáda</span><span class="item-price">65 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Džus</span><span class="item-price">45 Kč</span></div>
+        <div class="menu-item"><span class="item-name">Minerální voda</span><span class="item-price">35 Kč</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top: 3rem; margin-bottom: 0;">
+    <p style="font-size:0.82rem; color: rgba(245,240,232,0.4); font-style: italic; font-family: 'Cormorant Garamond', serif; font-size: 1.05rem;">
+      * Nabídka se může měnit · Ceny jsou orientační
+    </p>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section">
+  <div class="section-header">
+    <span class="section-label">Hosté říkají</span>
+    <h2 class="section-title">Co říkají <em>návštěvníci</em></h2>
+  </div>
+
+  <div class="reviews-grid">
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Příjemná kavárna přímo na náměstí. Káva skvělá, koláč arašídový rozhodně stojí za vyzkoušení. Obsluha rychlá."</p>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Super místo! Útulná atmosféra, dětský koutek — ideální pro rodiny. Chodíme pravidelně."</p>
+    </div>
+    <div class="review-card">
+      <div class="review-stars">★★★★★</div>
+      <p class="review-text">"Velký kus dortu, příjemná obsluha a výborná káva. Přesně to, co hledáte v centru města."</p>
+    </div>
+  </div>
+</section>
+
+<!-- INFO / HOURS -->
+<section class="info-section" id="hours">
+  <div class="section-header">
+    <span class="section-label">Praktické informace</span>
+    <h2 class="section-title">Navštivte <em>nás</em></h2>
+  </div>
+
+  <div class="info-grid">
+    <div class="hours-card">
+      <h3>Otevírací doba</h3>
+      <div class="hours-row"><span class="day">Pondělí</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row"><span class="day">Úterý</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row"><span class="day">Středa</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row"><span class="day">Čtvrtek</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row"><span class="day">Pátek</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row"><span class="day">Sobota</span><span class="time">9:00 – 19:00</span></div>
+      <div class="hours-row" style="border-bottom: none;"><span class="day">Neděle</span><span class="time">9:00 – 19:00</span></div>
+    </div>
+
+    <div class="contact-info">
+      <h3>Kontakt & Adresa</h3>
+
+      <div class="contact-item">
+        <div class="contact-icon">📍</div>
+        <div class="contact-detail">
+          <div class="label">Adresa</div>
+          <div class="value">Náměstí Dr. E. Beneše 18<br>431 11 Jirkov</div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">📞</div>
+        <div class="contact-detail">
+          <div class="label">Telefon</div>
+          <div class="value"><a href="tel:+420776121213">+420 776 121 213</a></div>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">🗓</div>
+        <div class="contact-detail">
+          <div class="label">Rezervace</div>
+          <div class="value">Zavolejte nám nebo nás navštivte přímo</div>
+        </div>
+      </div>
+
+      <div class="map-preview">
+        <div class="map-pin">
+          <div class="map-pin-dot"></div>
+          <span>Café Topofka · Jirkov</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    <span class="logo">Café Topofka</span>
+    <p>Náměstí Dr. E. Beneše 18, Jirkov</p>
+  </div>
+
+  <div class="footer-center">
+    "Dobrá káva je začátek<br>skvělého dne."
+  </div>
+
+  <div class="footer-right">
+    <p>+420 776 121 213</p>
+    <p>Po–Ne: 9:00 – 19:00</p>
+    <p style="margin-top:0.5rem; opacity:0.5;">© 2025 Café Topofka</p>
+  </div>
+</footer>
+
+<script>
+  // Subtle scroll animation for cards
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(el => {
+      if (el.isIntersecting) {
+        el.target.style.opacity = '1';
+        el.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.menu-card, .review-card, .hours-card, .contact-info').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(24px)';
+    el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>
